@@ -21,10 +21,9 @@ class PredictionListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = Profile.objects.get(id = self.request.user.id)
         if(user.role == 1):
-            queryset = PredictionImage.objects.filter(reported = True).order_by('-reported_date')
+            queryset = PredictionImage.objects.filter(reported = True).order_by('-id')
         else :    
-            queryset = PredictionImage.objects.filter(user = self.request.user.id).order_by('-date')
-        print(queryset)
+            queryset = PredictionImage.objects.filter(user = self.request.user.id).order_by('-id')
         return queryset
     
     def post(self, request, *args, **kwargs):
@@ -33,7 +32,7 @@ class PredictionListView(generics.ListCreateAPIView):
         db.user = Profile.objects.get(id=self.request.user.id)
         db.image = data['image']
         db.save()
-        result = predict('media/imageToPredict/'+str(data['image']))
+        result = predict('media/'+str(db.image))
         db.prediction = result['prediction']
         db.confidence = result['confidence']
         db.save()
